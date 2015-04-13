@@ -87,16 +87,16 @@ public class SegmentedTorusTest extends Application {
         Group group = new Group();
         group.getChildren().add(cameraTransform);    
         
-        torus = new SegmentedTorusMesh(42, 42, 0, 500d, 100d); 
+        torus = new SegmentedTorusMesh(184, 42, 0, 300d, 100d); 
         PhongMaterial matTorus = new PhongMaterial(Color.ORANGE);
         torus.setMaterial(matTorus);
 //        banner = new SegmentedTorusMesh(50, 42, 14, 500d, 300d); 
 //        PhongMaterial matBanner = new PhongMaterial();
 //        matBanner.setDiffuseMap(new Image(getClass().getResource("res/Duke3DprogressionSmall.jpg").toExternalForm()));
 //        banner.setMaterial(matBanner);
-        torus.setDrawMode(DrawMode.LINE);
+        torus.setDrawMode(DrawMode.FILL);
     // NONE
-        torus.setTextureModeNone(Color.WHITE);
+//        torus.setTextureModeNone(Color.WHITE);
     // IMAGE
 //        torus.setTextureModeImage(getClass().getResource("res/grid1.png").toExternalForm());
 //        banner.setTextureModeImage(getClass().getResource("res/Duke3DprogressionSmall.jpg").toExternalForm());
@@ -192,7 +192,7 @@ public class SegmentedTorusTest extends Application {
 //                    torus.setMinorRadius(150+10*(count.get()%10));
 //                    torus.setMinorRadius(torus.getMinorRadius() + 1);
 //                    torus.setPatternScale();
-                    torus.updateFigure();
+//                    torus.updateFigure();
                     count.getAndIncrement();
                     lastEffect = now;
                 }
