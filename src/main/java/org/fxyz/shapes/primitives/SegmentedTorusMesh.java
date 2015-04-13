@@ -55,9 +55,9 @@ public class SegmentedTorusMesh extends TexturedMesh {
         setMajorRadiusCrop(crop);
         setMajorRadius(majorRadius);
         setMinorRadius(minorRadius);
-        setTextureModeFaces(256*256);
+        setTextureModeFaces(256 * 256);
         updateMesh();
-        setCullFace(CullFace.NONE);
+        setCullFace(CullFace.BACK);
         setDrawMode(DrawMode.FILL);
         setDepthTest(DepthTest.ENABLE);
     }
@@ -281,6 +281,7 @@ public class SegmentedTorusMesh extends TexturedMesh {
     public DoubleProperty zOffsetProperty() {
         return zOffset;
     }
+    private Point3D last = new Point3D(0,0,0);
 
     private TriangleMesh createTorus(int subDivX, int subDivY, int crop, float meanRadius,
             float minorRadius, float tubeStartAngle, float xOffset, float yOffset, float zOffset) {
@@ -295,7 +296,7 @@ public class SegmentedTorusMesh extends TexturedMesh {
         areaMesh.setWidth(2d * Math.PI * (meanRadius + minorRadius));
         areaMesh.setHeight(2d * Math.PI * minorRadius);
         List<Integer> arr = new ArrayList<>();
-          List<Integer> arr2 = new ArrayList<>();
+        List<Integer> arr2 = new ArrayList<>();
         // Create points
         for (int y = crop; y <= subDivY - crop; y++) {
             float dy = (float) y / subDivY;
@@ -305,16 +306,25 @@ public class SegmentedTorusMesh extends TexturedMesh {
                     pointX = (float) ((meanRadius + minorRadius * Math.cos((-1d + 2d * dy) * Math.PI)) * (Math.cos((-1d + 2d * dx) * Math.PI) + xOffset));
                     pointZ = (float) ((meanRadius + minorRadius * Math.cos((-1d + 2d * dy) * Math.PI)) * (Math.sin((-1d + 2d * dx) * Math.PI) + yOffset));
                     pointY = (float) (minorRadius * Math.sin((-1d + 2d * dy) * Math.PI) * zOffset);
-                    if (pointX > 0 && pointZ > 0) {
-                        listVertices.add(new Point3D(pointX, pointY, pointZ)
-                        );
-                    } else {
-                        arr.add(x);
-                        arr2.add(y);
-                    }
+//                    if (pointX > 0 && pointZ > 0) {
+                        listVertices.add(new Point3D(pointX, pointY, pointZ));
+                        last = new Point3D(new Point3D(pointX, pointY, pointZ));
+//                    } else {
+//                        listVertices.add(new Point3D(0,0,0));
+//                        arr.add(x);
+//                        arr2.add(y);
+//                    }
                 }
             }
         }
+        Point3D zero = new Point3D(0,0,0);
+//        for(Point3D p : listVertices) {
+//            if(p.x == 0 && p.y == 0) {
+//                p.x = 1;
+//                p.y = 0;
+//                p.z = (float) (getMajorRadius());
+//            }
+//        }
         System.out.println("listVertices " + listVertices.size());
         // Create texture coordinates
         createTexCoords(subDivX - 2 * crop, subDivY - 2 * crop);
@@ -338,10 +348,12 @@ public class SegmentedTorusMesh extends TexturedMesh {
         for (int y = crop; y < subDivY - crop; y++) {
             for (int x = crop; x < subDivX - crop; x++) {
                 if (arr.contains(x) && arr2.contains(y)) {
-                     System.out.println("ELLSE");
+                    System.out.println("ELLSE");
+                    listFaces.add(new Face3(0,0,0));
+                    listFaces.add(new Face3(0,0,0));
                     continue;
                 }
-               
+
                 int p00 = (y - crop) * ((crop > 0) ? numDivX : numDivX - 1) + (x - crop);
                 int p01 = p00 + 1;
                 if (crop == 0 && x == subDivX - 1) {
@@ -359,23 +371,24 @@ public class SegmentedTorusMesh extends TexturedMesh {
                 listFaces.add(new Face3(p11, p01, p00));
             }
         }
-           System.out.println("listFaces " + listFaces.size());
-//        for (Point3D p : listVertices) {
-//            if (p.x < 0) {
-//                p.x = -p.x;
-//            }
-//            if (p.z < 0) {
-//                p.z = -p.z;
-//            }
-//        }
+        System.out.println("listFaces " + listFaces.size());
+        for (Point3D p : listVertices) {
+            if (p.x < 0) {
+                p.x = -p.x;
+            }
+            if (p.z < 0) {
+                p.z = -p.z;
+            }
+        }
         Cylinder cc = new Cylinder();
-        double counter = -1;
         values = new TreeMap<>();
+        angles.clear();
+        valPoints.clear();
         int lvl = 0;
         for (Point3D p : listVertices) {
             float angle = p.z / p.x;
             angle = (float) Math.atan(angle);
-            angle = roundResult(angle, 0);
+            angle = roundResult(angle, 2);
 
             if (!values.containsKey(angle)) {
                 values.put(angle, new ArrayList<>());
@@ -415,38 +428,49 @@ public class SegmentedTorusMesh extends TexturedMesh {
     private List<Float> angles = new ArrayList<>();
     private List<List<Point3D>> valPoints = new ArrayList<>();
 
+    int counter = 0;
+
     public void updateFigure() {
+        counter++;
+        if (counter == 170) {
+            updateMesh();
+            setMesh(createMesh());
+            counter = 0;
+        }
         if (incVal == null) {
             incVal = new ArrayList<>();
             float tmp = 0;
             for (int i = 0; i < values.keySet().size(); i++) {
                 incVal.add(tmp);
-                tmp += 0.005;
+                tmp += 0.004;
             }
             Collections.reverse(incVal);
         }
         if (incValRad == null) {
             incValRad = new ArrayList<>();
             float tmp = 0;
-            for (int i = 0; i < values.keySet().size(); i++) {
+            incValRad.add(tmp);
+            tmp = 0.008f;
+            for (int i = 1; i < values.keySet().size(); i++) {
                 incValRad.add(tmp);
-                tmp += 0.001;
+//                tmp *= 1.05;
             }
             Collections.reverse(incValRad);
         }
         if (zCoordinate == null) {
             zCoordinate = new ArrayList<>();
             for (int i = 0; i < angles.size(); i++) {
-                zCoordinate.add(i * 100f);
+                zCoordinate.add(i * 20f);
             }
+            Collections.reverse(zCoordinate);
         }
         switch (currentState) {
             case 1:
                 int i = 0;
                 for (int j = 0; j < angles.size(); j++) {
 
-                    rotateByKey(angles.get(j), valPoints.get(j), incVal.get(i), j);
-                    increaseRadius(angles.get(j), valPoints.get(j), incValRad.get(i), j);
+                    rotateByKey(angles.get(j), valPoints.get(j), incVal.get(j), j);
+                    increaseRadius(angles.get(j), valPoints.get(j), incValRad.get(j), j);
 //                Float val = (Float) values.keySet().toArray()[0];
 //                    increaseRadius(val, 0.004f);
 //                Float key = (Float) values.keySet().toArray()[7];
@@ -488,8 +512,16 @@ public class SegmentedTorusMesh extends TexturedMesh {
             System.out.println("ERROR for key " + key);
             return;
         }
-        float y = (float) (Math.sin(key.floatValue()) * (getMajorRadius()));
-        float x = (float) (Math.cos(key.floatValue()) * (getMajorRadius()));
+        Float aa = key;
+//        double[][] ar = MatrixOperations.rotatePoint(getMajorRadius(), 0, 0, 0, key);;
+//        if(key > Math.PI / 2) {
+//            aa = key - (float)Math.PI / 2;
+//            
+//        }
+        float y = (float) (Math.sin(aa.floatValue()) * (getMajorRadius()));
+        float x = (float) (Math.cos(aa.floatValue()) * (getMajorRadius()));
+//        x = (float) ar[0][0];
+//        y = (float) ar[0][1];
         float z;
         z = zCoordinate.get(index);
         List<Point3D> vectors = findVectors(points, new Point3D(x, z, y), val);

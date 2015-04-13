@@ -465,6 +465,7 @@ public abstract class TexturedMesh extends MeshView {
                 break;
             case COLORED_FACES:
                 triangleMesh.getTexCoords().setAll(helper.getTexturePaletteArray());
+                int[] faces = helper.updateFacesWithFaces(listFaces);
                 triangleMesh.getFaces().setAll(helper.updateFacesWithFaces(listFaces));
                 break;
         }
@@ -481,7 +482,7 @@ public abstract class TexturedMesh extends MeshView {
         }
         
         System.out.println("nodes: "+listVertices.size()+", faces: "+listFaces.size());
-//        System.out.println("area: "+helper.getMeshArea(listVertices, listFaces));
+        System.out.println("area: "+helper.getMeshArea(listVertices, listFaces));
         return triangleMesh;
     }
     
