@@ -62,22 +62,22 @@ public class SegmentedTorusTest extends Application {
         cameraTransform.setTranslate(0, 0, 0);
         cameraTransform.getChildren().add(camera);
         camera.setNearClip(0.1);
-        camera.setFarClip(10000.0);
-        camera.setTranslateZ(-3000);
+        camera.setFarClip(20000.0);
+        camera.setTranslateZ(-9000);
         camera.setTranslateX(0);
 //        camera.setTranslateX(4000);
         cameraTransform.ry.setAngle(-45.0);
         cameraTransform.rx.setAngle(-30.0);
         //add a Point Light for better viewing of the grid coordinate system
-        PointLight light = new PointLight(Color.LIME);
+        PointLight light = new PointLight(Color.WHITE);
         PointLight light1 = new PointLight(Color.PALEGOLDENROD);
         
         cameraTransform.getChildren().add(light);
-        cameraTransform.getChildren().add(light1);
+//        cameraTransform.getChildren().add(light1);
 //     cameraTransform.getChildren().add(new AmbientLight(Color.WHITE));
-        light.setTranslateX(2000);
+        light.setTranslateX(camera.getTranslateX());
         light.setTranslateY(camera.getTranslateY());
-        light.setTranslateZ(-2000);   
+        light.setTranslateZ(camera.getTranslateZ());   
         light1.setTranslateX(-2000);
         light1.setTranslateY(0);
         light1.setTranslateZ(-1500);
@@ -87,8 +87,8 @@ public class SegmentedTorusTest extends Application {
         Group group = new Group();
         group.getChildren().add(cameraTransform);    
         
-        torus = new SegmentedTorusMesh(442, 44, 0, 150d, 50d); 
-        PhongMaterial matTorus = new PhongMaterial(Color.ORANGE);
+        torus = new SegmentedTorusMesh(92, 44, 0, 210d, 120d); 
+        PhongMaterial matTorus = new PhongMaterial(Color.ROYALBLUE);
         torus.setMaterial(matTorus);
 //        banner = new SegmentedTorusMesh(50, 42, 14, 500d, 300d); 
 //        PhongMaterial matBanner = new PhongMaterial();
@@ -103,9 +103,9 @@ public class SegmentedTorusTest extends Application {
     // PATTERN
 //       torus.setTextureModePattern(1.0d);
     // DENSITY
-//        torus.setTextureModeVertices3D(256*256,dens);
+        torus.setTextureModeVertices3D(256*256,dens);
     // FACES
-        torus.setTextureModeFaces(256*256);
+//        torus.setTextureModeFaces(256*256);
         
         torus.getTransforms().addAll(new Rotate(0,Rotate.X_AXIS),rotateY);
 //        banner.getTransforms().addAll(new Rotate(0,Rotate.X_AXIS),rotateY);
