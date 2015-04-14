@@ -55,7 +55,7 @@ public class SegmentedTorusMesh extends TexturedMesh {
         setMajorRadiusCrop(crop);
         setMajorRadius(majorRadius);
         setMinorRadius(minorRadius);
-        setTextureModeFaces(256 * 256);
+//        setTextureModeFaces(256 * 256);
         updateMesh();
         setCullFace(CullFace.BACK);
         setDrawMode(DrawMode.FILL);
